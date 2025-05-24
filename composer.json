@@ -1,0 +1,35 @@
+{
+    "name": "haikiri/declension-helper",
+    "description": "This package is made for work with the declensions of pronouns in languages such as Russian and Ukrainian.",
+    "keywords": [
+        "php",
+        "pronouns",
+        "language",
+        "declension"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Haikiri\\DeclensionHelper\\": "src/"
+        }
+    },
+    "autoload-dev": {},
+    "authors": [
+        {
+            "name": "Haikiri",
+            "email": "haikiri@ya.ru",
+            "homepage": "https://haikiri.t.me"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.1"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit src/DeclensionTest.php --colors=always"
+    }
+}
