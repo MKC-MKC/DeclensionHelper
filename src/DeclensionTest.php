@@ -62,4 +62,28 @@ class DeclensionTest extends TestCase
 		self::assertSame(expected: $expected, actual: $data);
 	}
 
+	/**
+	 * Пример возврата строки соответствующего ключа формы, относительно переданного номера.
+	 */
+	public static function test_6(): void
+	{
+		# Формы года.
+		$forms = ["год", "года", "лет"];
+
+		# Как: "21 год"
+		$return = "год";
+		$result = Declension::prepare(number: 21, forms: $forms);
+		self::assertSame(expected: $return, actual: $result);
+
+		# Как: "22 года"
+		$return = "года";
+		$result = Declension::prepare(number: 22, forms: $forms);
+		self::assertSame(expected: $return, actual: $result);
+
+		# Как: "26 лет"
+		$return = "лет";
+		$result = Declension::prepare(number: 26, forms: $forms);
+		self::assertSame(expected: $return, actual: $result);
+	}
+
 }
