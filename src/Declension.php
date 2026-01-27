@@ -11,6 +11,22 @@ final class Declension
 
 	private static array $registry = [];
 
+	/** @throws InvalidArgumentException */
+	public static function prepare($number, array $forms): string
+	{
+		if (count($forms) !== 3) throw new InvalidArgumentException("3 forms are expected");
+
+		$n = (int)floor((float)$number);
+		[$one, $few, $many] = array_values($forms);
+		if ($n % 100 >= 11 && $n % 100 <= 20) return $many;
+
+		return match ($n % 10) {
+			1 => $one,
+			2, 3, 4 => $few,
+			default => $many,
+		};
+	}
+
 	private static function normalizeKey(string $key): string
 	{
 		return rtrim($key, ".");
@@ -38,18 +54,7 @@ final class Declension
 			throw new InvalidArgumentException("unknown declension key");
 		}
 
-		$n = (int)floor((float)$number);
-		[$one, $few, $many] = self::$registry[self::normalizeKey($key)];
-
-		if ($n % 100 >= 11 && $n % 100 <= 20) {
-			return $many;
-		}
-
-		return match ($n % 10) {
-			1 => $one,
-			2, 3, 4 => $few,
-			default => $many,
-		};
+		return self::prepare($number, self::$registry[self::normalizeKey($key)]);
 	}
 
 	public static function format($number, string $key, string $template = "{item} {form}"): string
