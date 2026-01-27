@@ -49,6 +49,9 @@ class DeclensionTest extends TestCase
 		self::assertSame(expected: $expected, actual: $data);
 	}
 
+	/**
+	 * Пример с использованием шаблона дней.
+	 */
 	public static function test_5($number = 22, $expected = "Интернет отключится через 22 дня"): void
 	{
 		Declension::set("дн.", ["день", "дня", "дней"]);
