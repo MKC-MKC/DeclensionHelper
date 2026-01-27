@@ -63,7 +63,7 @@ final class Declension
 		return str_replace(
 			["{item}", "{form}"],
 			[(int)floor((float)$number), $form],
-			$template
+			$template,
 		);
 	}
 
