@@ -14,10 +14,8 @@ final class Declension
 	/** @throws InvalidArgumentException */
 	public static function prepare($number, array $forms): string
 	{
-		if (count($forms) !== 3) throw new InvalidArgumentException("3 forms are expected");
-
-		$n = (int)floor((float)$number);
-		[$one, $few, $many] = array_values($forms);
+		$n = abs(self::normalizeNumber($number));
+		[$one, $few, $many] = self::normalizeForms($forms);
 		if ($n % 100 >= 11 && $n % 100 <= 20) return $many;
 
 		return match ($n % 10) {
@@ -40,11 +38,7 @@ final class Declension
 	/** @throws InvalidArgumentException */
 	public static function set(string $key, array $forms): void
 	{
-		if (count($forms) !== 3) {
-			throw new InvalidArgumentException("3 forms are expected");
-		}
-
-		self::$registry[self::normalizeKey($key)] = array_values($forms);
+		self::$registry[self::normalizeKey($key)] = self::normalizeForms($forms);
 	}
 
 	/** @throws InvalidArgumentException */
@@ -60,11 +54,42 @@ final class Declension
 	public static function format($number, string $key, string $template = "{item} {form}"): string
 	{
 		$form = self::get($number, $key);
+		$intNumber = self::normalizeNumber($number);
 		return str_replace(
 			["{item}", "{form}"],
-			[(int)floor((float)$number), $form],
+			[$intNumber, $form],
 			$template,
 		);
+	}
+
+	private static function normalizeNumber($number): int
+	{
+		if (is_int($number)) return $number;
+
+		if (is_float($number)) {
+			if (!is_finite($number)) throw new InvalidArgumentException("number must be finite");
+			return (int)floor($number);
+		}
+
+		if (is_string($number)) {
+			$value = trim($number);
+			if ($value === "" || !is_numeric($value)) throw new InvalidArgumentException("number must be numeric");
+			return (int)floor((float)$value);
+		}
+
+		throw new InvalidArgumentException("number must be numeric");
+	}
+
+	private static function normalizeForms(array $forms): array
+	{
+		if (count($forms) !== 3) throw new InvalidArgumentException("3 forms are expected");
+
+		$values = array_values($forms);
+		foreach ($values as $form) if (!is_string($form)) {
+			throw new InvalidArgumentException("forms must contain only strings");
+		}
+
+		return $values;
 	}
 
 }

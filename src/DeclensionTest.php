@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Haikiri\DeclensionHelper;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /** @see Declension */
@@ -21,6 +22,7 @@ class DeclensionTest extends TestCase
 
 	/**
 	 * Вариант 2. Получение текста по стандартному шаблону.
+	 * @noinspection SpellCheckingInspection
 	 */
 	public static function test_2($number = "2", $expected = "2 гривні"): void
 	{
@@ -84,6 +86,70 @@ class DeclensionTest extends TestCase
 		$return = "лет";
 		$result = Declension::prepare(number: 26, forms: $forms);
 		self::assertSame(expected: $return, actual: $result);
+	}
+
+	/**
+	 * Вариант 7. Отрицательное число должно склоняться по модулю.
+	 */
+	public static function test_7($number = -1, $expected = "-1 рубль"): void
+	{
+		Declension::set("руб", ["рубль", "рубля", "рублей"]);
+		$data = Declension::format($number, "руб");
+		self::assertSame($expected, $data);
+	}
+
+	/**
+	 * Вариант 8. Проверка исключения для неизвестного ключа.
+	 */
+	public static function test_8(): void
+	{
+		try {
+			Declension::get(1, "unknown");
+			self::fail("Ожидалось исключение InvalidArgumentException");
+		} catch (InvalidArgumentException $exception) {
+			self::assertSame("unknown declension key", $exception->getMessage());
+		}
+	}
+
+	/**
+	 * Вариант 9. Проверка исключения для нечислового значения.
+	 */
+	public static function test_9(): void
+	{
+		Declension::set("руб", ["рубль", "рубля", "рублей"]);
+
+		try {
+			Declension::format("abc", "руб");
+			self::fail("Ожидалось исключение InvalidArgumentException");
+		} catch (InvalidArgumentException $exception) {
+			self::assertSame("number must be numeric", $exception->getMessage());
+		}
+	}
+
+	/**
+	 * Вариант 10. Проверка исключения для некорректного списка форм.
+	 */
+	public static function test_10(): void
+	{
+		try {
+			Declension::set("usd", ["доллар", "доллара"]);
+			self::fail("Ожидалось исключение InvalidArgumentException");
+		} catch (InvalidArgumentException $exception) {
+			self::assertSame("3 forms are expected", $exception->getMessage());
+		}
+	}
+
+	/**
+	 * Вариант 11. Проверка исключения для non-string форм.
+	 */
+	public static function test_11(): void
+	{
+		try {
+			Declension::prepare(1, ["доллар", "доллара", 123]);
+			self::fail("Ожидалось исключение InvalidArgumentException");
+		} catch (InvalidArgumentException $exception) {
+			self::assertSame("forms must contain only strings", $exception->getMessage());
+		}
 	}
 
 }
